@@ -89,6 +89,7 @@ These give tools to every agent magpie connects. magpie serves them on its MCP s
 
 | Package | Tools |
 |---|---|
+| [search1api](packages/search1api) | Web search, news, agentic search, page retrieval, sitemaps and trends, with Search1API OAuth or an API key |
 | [calc](packages/calc) | `eval` exact arithmetic in fractions, `convert` units (data, time, length, mass, angle, temperature), `date` calendar date math across time zones and DST. No network, no key |
 
 ```sh
