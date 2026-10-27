@@ -2,7 +2,7 @@ import { serviceURL, USER_AGENT } from "./types.ts";
 
 export class AuthenticationError extends Error {}
 
-// Only the six reviewed endpoints are exposed. Match the original client's
+// Only the reviewed endpoints (six tools and feedback) are exposed. Match the original client's
 // request bodies and deadlines without adding runtime npm dependencies.
 export async function request(
   baseUrl: string,

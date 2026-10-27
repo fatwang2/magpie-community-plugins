@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { Credentials } from "./auth.ts";
-import { CATEGORIES, DESCRIPTION, sendFeedback } from "./feedback.ts";
+import { CATEGORIES, DESCRIPTION, feedbackBody } from "./feedback.ts";
 import { startOAuth } from "./oauth.ts";
 import { AuthenticationError, request } from "./request.ts";
 import { filters, maxResults, query, searchBody, validate, type ArgumentsSchema, type Schema } from "./tools.ts";
@@ -11,6 +11,19 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
     throw new Error("apiKey must be a string.");
   const baseUrl = serviceURL(options.baseUrl ?? API_BASE).href.replace(/\/$/, "");
   const credentials = new Credentials(input, options);
+
+  async function send(name: string, payload: Record<string, unknown>, signal: AbortSignal) {
+    let auth = await credentials.token(signal);
+    signal.throwIfAborted();
+    try {
+      return await request(baseUrl, name, auth.token, payload, signal);
+    } catch (error) {
+      if (!(error instanceof AuthenticationError) || !auth.oauth) throw error;
+      const renewed = await credentials.renew(auth.oauth, signal);
+      auth = { token: renewed.access, oauth: renewed };
+      return await request(baseUrl, name, auth.token, payload, signal);
+    }
+  }
 
   function tool(
     name: string,
@@ -24,19 +37,7 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
       description,
       args,
       async execute(value: unknown, ctx: { abort: AbortSignal }) {
-        const payload = body(validate(args, value));
-        const signal = ctx.abort;
-        let auth = await credentials.token(signal);
-        signal.throwIfAborted();
-        let result: unknown;
-        try {
-          result = await request(baseUrl, name, auth.token, payload, signal);
-        } catch (error) {
-          if (!(error instanceof AuthenticationError) || !auth.oauth) throw error;
-          const renewed = await credentials.renew(auth.oauth, signal);
-          auth = { token: renewed.access, oauth: renewed };
-          result = await request(baseUrl, name, auth.token, payload, signal);
-        }
+        const result = await send(name, body(validate(args, value)), ctx.abort);
         return JSON.stringify(result, null, 2);
       },
     };
@@ -96,10 +97,16 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
         description: DESCRIPTION,
         args: feedbackArgs,
         async execute(value: unknown, ctx: { abort: AbortSignal }) {
-          const args = validate(feedbackArgs, value);
-          // Feedback is free and goes out even when no credential works.
-          const token = await credentials.token(ctx.abort).then((auth) => auth.token, () => undefined);
-          return sendFeedback(baseUrl, token, args, ctx.abort);
+          const payload = feedbackBody(validate(feedbackArgs, value));
+          // A report that cannot be sent must not fail the agent's task.
+          try {
+            const receipt = await send("feedback", payload, ctx.abort) as { id?: unknown };
+            return `Feedback recorded (${typeof receipt?.id === "string" ? receipt.id : "ok"}). Thank you.`;
+          } catch (error) {
+            ctx.abort.throwIfAborted();
+            const reason = error instanceof Error ? error.message : "Search1API feedback failed.";
+            return `Feedback was not recorded: ${reason} Continue the task.`;
+          }
         },
       },
     },

@@ -130,13 +130,11 @@ your Magpie tools endpoint.
 - `sitemap`: discover site links.
 - `trending`: GitHub or Hacker News trends.
 - `send_feedback`: report a wrong or empty result, an unresolved error,
-  mismatched docs or a missing capability to the Search1API team. It is free.
-  The report (message, intent, category, request id and model) is sent to
-  Search1API's feedback inbox on [Agentback](https://agentback.app), a
-  third-party host, like the Search1API MCP server and CLI. When you are signed
-  in, your Search1API account id and Search1API's signature over it go to
-  agentback.app with the report, so it is linked to your account; your API key
-  or OAuth token is only sent to Search1API to obtain that signature.
+  mismatched docs or a missing capability to the Search1API team, through
+  Search1API's `POST /feedback` API. It is free and needs a Search1API sign-in or API key. The report (message,
+  intent, category, request id and model) goes only to Search1API, which stores
+  it in its feedback inbox on [Agentback](https://agentback.app), a
+  third-party host, linked to your Search1API account.
 
 Search tool parameters follow the existing OpenCode integration. Search and news
 preserve optional `published_date` and per-result `metadata`; Ask preserves
