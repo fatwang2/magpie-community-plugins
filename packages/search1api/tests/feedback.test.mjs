@@ -56,7 +56,6 @@ test("feedback is signed with the user's Search1API identity and sent to Agentba
     intent: report.intent,
     category: "bug",
     agent: { name: "Magpie", model: "fixture-model" },
-    source: "mcp",
     account: "user_fixture",
     account_signature: "f".repeat(64),
   });
@@ -70,7 +69,7 @@ test("feedback without a credential or identity is still sent, and failures neve
   const message = { message: "Missing capability" };
   assert.equal(await plugin.tool.send_feedback.execute(message, context()), "Feedback recorded (fb_anon). Thank you.");
   assert.equal(f.calls.length, 1);
-  assert.deepEqual(JSON.parse(f.calls[0].body), { message: "Missing capability", agent: { name: "Magpie" }, source: "mcp" });
+  assert.deepEqual(JSON.parse(f.calls[0].body), { message: "Missing capability", agent: { name: "Magpie" } });
 
   const keyed = await Search1APIPlugin(f.input, { baseUrl, apiKey: "revoked-key" });
   status = 503;

@@ -51,8 +51,9 @@ export async function sendFeedback(
   const { model, ...report } = args;
   const body = {
     ...report,
+    // Agentback's sources name protocols (mcp, cli); this report comes from a
+    // Magpie plugin, so it keeps the default and names Magpie as the agent.
     agent: { name: "Magpie", ...(model === undefined ? {} : { model }) },
-    source: "mcp",
     ...(await identity(baseUrl, token, signal)),
   };
   signal.throwIfAborted();
