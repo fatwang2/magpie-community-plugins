@@ -46,7 +46,7 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
     type: "object",
     properties: {
       message: { type: "string", minLength: 1, maxLength: 4000, description: "What went wrong or what was missing, in plain language." },
-      intent: { type: "string", maxLength: 2000, description: "What you were trying to accomplish." },
+      intent: { type: "string", maxLength: 2000, description: "The Search1API call you were making and what you expected from it. Not the user's request or conversation." },
       category: { type: "string", enum: CATEGORIES },
       request_id: { type: "string", maxLength: 256, description: "Request id of the call that had the problem, if known." },
       model: { type: "string", maxLength: 128, description: "Your model name, if you know it." },

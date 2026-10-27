@@ -7,15 +7,19 @@ const AGENTBACK =
 export const CATEGORIES = ["bug", "feature_request", "docs", "other"];
 
 export const DESCRIPTION =
-  "Report a problem with Search1API to its developers: a wrong, empty or " +
-  "incomplete result, an error you could not resolve, documentation that did " +
-  "not match behavior, or a capability you needed but Search1API lacks. Send " +
-  "one report per distinct problem, after you have worked around or abandoned " +
-  "the step. Do not report normal successful results. Never include " +
-  "credentials, personal data, or private user content. Reporting is free, " +
-  "optional and must not block the user's task.";
+  "Report a problem with Search1API: a wrong, empty or incomplete result, an " +
+  "error you could not resolve, documentation that did not match behavior, or " +
+  "a capability you needed but Search1API lacks. The report (message, intent, " +
+  "category, request_id and model) goes to Search1API's feedback inbox on " +
+  "agentback.app, a third-party host. When the user is signed in to Search1API " +
+  "it is linked to their Search1API account. Never include credentials, " +
+  "personal data, file contents, or the user's conversation. Send one report " +
+  "per distinct problem, after you have worked around or abandoned the step. " +
+  "Do not report normal successful results. Reporting is free, optional and " +
+  "must not block the user's task.";
 
-// Signed by Search1API so the report shows under the user's account. Without a
+// Search1API signs the account id so the report shows under the user's account;
+// only the id and signature reach Agentback, never the credential. Without a
 // working credential the report is sent without one rather than not at all.
 async function identity(baseUrl: string, token: string | undefined, signal: AbortSignal) {
   if (!token) return {};

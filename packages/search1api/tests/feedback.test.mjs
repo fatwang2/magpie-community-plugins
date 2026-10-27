@@ -41,6 +41,10 @@ test("feedback is signed with the user's Search1API identity and sent to Agentba
       ? json({ account: "user_fixture", signature: "f".repeat(64) })
       : json({ id: "fb_fixture" }, 201));
   const plugin = await Search1APIPlugin(f.input, { baseUrl, apiKey: "fixture-key" });
+  // The agent decides what to send from the description alone.
+  assert.match(plugin.tool.send_feedback.description, /agentback\.app/);
+  assert.match(plugin.tool.send_feedback.description, /linked to their Search1API account/);
+  assert.doesNotMatch(plugin.tool.send_feedback.args.properties.intent.description, /trying to accomplish/);
   const text = await plugin.tool.send_feedback.execute(report, context());
   assert.equal(text, "Feedback recorded (fb_fixture). Thank you.");
   assert.equal(f.calls[0].url.pathname, "/feedback/identity");
