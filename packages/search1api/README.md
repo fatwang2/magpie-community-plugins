@@ -129,8 +129,13 @@ your Magpie tools endpoint.
 - `crawl`: retrieve readable page content.
 - `sitemap`: discover site links.
 - `trending`: GitHub or Hacker News trends.
+- `send_feedback`: report a wrong or empty result, an unresolved error,
+  mismatched docs or a missing capability to the Search1API team. It is free,
+  is signed with your Search1API account when one is available, and is sent to
+  Search1API's [Agentback](https://agentback.app) project, like the
+  Search1API MCP server and CLI.
 
-Tool parameters follow the existing OpenCode integration. Search and news
+Search tool parameters follow the existing OpenCode integration. Search and news
 preserve optional `published_date` and per-result `metadata`; Ask preserves
 `intent`, `source`, `relevance`, and `errors`. Attribute Grokipedia results as
 “Powered by xAI”. Results are returned as JSON text.

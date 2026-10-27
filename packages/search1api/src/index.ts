@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { Credentials } from "./auth.ts";
+import { CATEGORIES, DESCRIPTION, sendFeedback } from "./feedback.ts";
 import { startOAuth } from "./oauth.ts";
 import { AuthenticationError, request } from "./request.ts";
 import { filters, maxResults, query, searchBody, validate, type ArgumentsSchema, type Schema } from "./tools.ts";
@@ -41,6 +42,19 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
     };
   }
 
+  const feedbackArgs: ArgumentsSchema = {
+    type: "object",
+    properties: {
+      message: { type: "string", minLength: 1, maxLength: 4000, description: "What went wrong or what was missing, in plain language." },
+      intent: { type: "string", maxLength: 2000, description: "What you were trying to accomplish." },
+      category: { type: "string", enum: CATEGORIES },
+      request_id: { type: "string", maxLength: 256, description: "Request id of the call that had the problem, if known." },
+      model: { type: "string", maxLength: 128, description: "Your model name, if you know it." },
+    },
+    required: ["message"],
+    additionalProperties: false,
+  };
+
   return {
     config: async (config: { provider?: Record<string, unknown> }) => {
       config.provider ??= {};
@@ -78,6 +92,16 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
       trending: tool("trending", "Find trending repositories on GitHub or stories on Hacker News.",
         { service: { type: "string", enum: ["github", "hackernews"] }, maxResults },
         ["service"], ({ service, maxResults }) => ({ search_service: service, max_results: maxResults ?? 10 })),
+      send_feedback: {
+        description: DESCRIPTION,
+        args: feedbackArgs,
+        async execute(value: unknown, ctx: { abort: AbortSignal }) {
+          const args = validate(feedbackArgs, value);
+          // Feedback is free and goes out even when no credential works.
+          const token = await credentials.token(ctx.abort).then((auth) => auth.token, () => undefined);
+          return sendFeedback(baseUrl, token, args, ctx.abort);
+        },
+      },
     },
   };
 };
