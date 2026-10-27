@@ -51,9 +51,10 @@ export async function sendFeedback(
   const { model, ...report } = args;
   const body = {
     ...report,
-    // Agentback's sources name protocols (mcp, cli); this report comes from a
-    // Magpie plugin, so it keeps the default and names Magpie as the agent.
     agent: { name: "Magpie", ...(model === undefined ? {} : { model }) },
+    // mcp and cli mean Search1API's own MCP server and CLI. A plugin posting
+    // with the public project key is a direct report; agent names Magpie.
+    source: "direct",
     ...(await identity(baseUrl, token, signal)),
   };
   signal.throwIfAborted();
