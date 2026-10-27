@@ -39,6 +39,13 @@ access, then return to Magpie. The plugin uses a dynamically registered public
 OAuth client, authorization code flow with PKCE S256, and a temporary loopback
 callback. No client secret or Search1API CLI is required.
 
+The client is registered once and saved, with its callback port, in
+`search1api-oauth-client.json` next to `plugin-auth.json`; later sign-ins
+reuse it. If that port is busy, or a sign-in with the saved client does not
+finish, the plugin registers a new client. The authorization URL carries
+`utm_source=magpie` and API requests send `User-Agent: search1api-magpie/<version>`,
+so Search1API can tell sign-ups and usage that come from Magpie.
+
 The browser must run on the same computer as Magpie. For a remote or container
 installation, use an API key instead. The callback expires after five minutes.
 
@@ -71,7 +78,7 @@ magpie plugin login search1api api
 ```
 
 Magpie prompts privately for the key and saves it in its credential store.
-Get a key at [s1.dev](https://s1.dev/).
+Get a key at [s1.dev](https://s1.dev/?utm_source=magpie&utm_medium=readme).
 
 For automated deployments, the plugin also accepts an `apiKey` plugin option
 in Magpie's options editor, or `SEARCH1API_API_KEY` in the environment of the

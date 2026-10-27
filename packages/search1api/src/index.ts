@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { Credentials } from "./auth.ts";
 import { startOAuth } from "./oauth.ts";
 import { AuthenticationError, request } from "./request.ts";
@@ -50,7 +51,7 @@ export const Search1APIPlugin = async (input: PluginInput, options: Options = {}
       provider: PROVIDER,
       single: true,
       methods: [
-        { type: "oauth" as const, label: "Sign in to Search1API", authorize: () => startOAuth(baseUrl) },
+        { type: "oauth" as const, label: "Sign in to Search1API", authorize: () => startOAuth(baseUrl, undefined, join(input.directory, "search1api-oauth-client.json")) },
         { type: "api" as const, label: "Search1API API key" },
       ],
       refreshLead: 60_000,

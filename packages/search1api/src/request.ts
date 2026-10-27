@@ -1,4 +1,4 @@
-import { serviceURL } from "./types.ts";
+import { serviceURL, USER_AGENT } from "./types.ts";
 
 export class AuthenticationError extends Error {}
 
@@ -19,6 +19,7 @@ export async function request(
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      "User-Agent": USER_AGENT,
     },
     body: JSON.stringify(body),
     signal: AbortSignal.any([
